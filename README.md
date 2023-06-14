@@ -1,5 +1,5 @@
-# API REST AGENDAMENTO
-Api Rest desenvolvido em PHP utilizando autenticação por token. Essa API está sendo utilizada na Aplicativo Agendamento - hospedado no meu repositório.
+# API REST Helpdesk
+Api Rest desenvolvido em PHP utilizando autenticação por token. Essa API está sendo utilizada na Aplicativo Helpdesk - hospedado no meu repositório.
 
 Para utilizar:
 
