@@ -4,6 +4,8 @@ namespace Repository;
 
 use DB\MySQL;
 
+
+
 class UsuarioRepository
 {
     private object $MySQL;
@@ -32,8 +34,9 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
-    public function updateUser($id, $dados){
-        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET cpf = :cpf, nome = :nome, sobrenome = :sobrenome, login = :login ,senha = :senha,ativo = :ativo, cargo = :cargo WHERE id = :id';
+    public function updateUser($id, $dados)
+    {
+        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET cpf = :cpf, nome = :nome, sobrenome = :sobrenome, login = :login, senha = :senha, ativo = :ativo, cargo = :cargo, imagem = :imagem WHERE id = :id';
         $this->MySQL->getDb()->beginTransaction();
         $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
         $stmt->bindParam(':id', $id);
@@ -44,10 +47,34 @@ class UsuarioRepository
         $stmt->bindParam(':senha', $dados['senha']);
         $stmt->bindParam(':ativo', $dados['ativo']);
         $stmt->bindParam(':cargo', $dados['cargo']);
+    
+        // Verifica se foi enviada uma imagem
+        if (isset($dados['imagem'])) {
+
+          // $diretorioimagens = 'upload/';
+
+          //  $nomeimagem = uniqid() . '_' . $dados['imagem']['name'];
+
+            //move_uploaded_file($dados['imagem'], 'upload/' .$dados['imagem']);
+
+    
+            // Define o valor do parâmetro :imagem como o caminho completo da imagem
+            $stmt->bindParam(':imagem', $dados['imagem']);
+        } else {
+            // Se não foi enviada uma nova imagem, mantém a imagem existente no banco de dados
+            $consultaimagem = 'SELECT imagem FROM ' . self::TABELA . ' WHERE id = :id';
+            $stmtimagem = $this->MySQL->getDb()->prepare($consultaimagem);
+            $stmtimagem->bindParam(':id', $id);
+            $stmtimagem->execute();
+            $imagemAtual = $stmtimagem->fetchColumn();
+    
+            $stmt->bindParam(':imagem', $imagemAtual);
+        }
+    
         $stmt->execute();
         return $stmt->rowCount();
     }
-
+    
     public function loginUser($login, $senha){
         $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE login = :login AND senha = :senha AND ativo = "s" ';
         $stmt = $this->MySQL->getDb()->prepare($consulta);
