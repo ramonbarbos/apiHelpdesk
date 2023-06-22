@@ -6,7 +6,7 @@ error_reporting(E_ERROR);
 
 /* CONSTANTES DO BANCO */
 define('HOST', 'localhost');
-define('BANCO', 'api');
+define('BANCO', 'api_helpdesk');
 define('USUARIO', 'root');
 define('SENHA', '');
 
