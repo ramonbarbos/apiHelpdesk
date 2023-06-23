@@ -47,30 +47,18 @@ class UsuarioRepository
         $stmt->bindParam(':senha', $dados['senha']);
         $stmt->bindParam(':ativo', $dados['ativo']);
         $stmt->bindParam(':cargo', $dados['cargo']);
-    
-        // Verifica se foi enviada uma imagem
-        if (isset($dados['imagem'])) {
+       
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
 
-          // $diretorioimagens = 'upload/';
-
-          //  $nomeimagem = uniqid() . '_' . $dados['imagem']['name'];
-
-            //move_uploaded_file($dados['imagem'], 'upload/' .$dados['imagem']);
-
-    
-            // Define o valor do parâmetro :imagem como o caminho completo da imagem
-            $stmt->bindParam(':imagem', $dados['imagem']);
-        } else {
-            // Se não foi enviada uma nova imagem, mantém a imagem existente no banco de dados
-            $consultaimagem = 'SELECT imagem FROM ' . self::TABELA . ' WHERE id = :id';
-            $stmtimagem = $this->MySQL->getDb()->prepare($consultaimagem);
-            $stmtimagem->bindParam(':id', $id);
-            $stmtimagem->execute();
-            $imagemAtual = $stmtimagem->fetchColumn();
-    
-            $stmt->bindParam(':imagem', $imagemAtual);
-        }
-    
+    public function updateImage($id, $imagem)
+    {
+        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET imagem = :imagem WHERE id = :id';
+        $this->MySQL->getDb()->beginTransaction();
+        $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':imagem', $imagem);
         $stmt->execute();
         return $stmt->rowCount();
     }

@@ -14,7 +14,7 @@ class UsuarioService
     public const RECURSOS_GET = ['listar'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
-    public const RECURSOS_PUT = ['atualizar'];
+    public const RECURSOS_PUT = ['atualizar', 'upimagem'];
     public const RECURSOS_LOGIN = ['login'];
 
     private array $dados;
@@ -34,7 +34,9 @@ class UsuarioService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_GET, true)) {
 
-            $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
+           
+                $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
+           
 
         } else{
             throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -94,10 +96,19 @@ class UsuarioService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_PUT, true)) {
             if ($this->dados['id'] > 0) {
-                $retorno = $this->$recurso();
+               
+                    if ($recurso === 'upimagem') {
+                        $retorno = $this->upImage();
+                    
+                    }else  {
+                        $retorno = $this->$recurso();
+                    }
             } else {
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_ID_OBRIGATORIO);
             }
+
+
+
         } else {
             throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
         }
@@ -174,5 +185,25 @@ class UsuarioService
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_SENHA_OBRIGATORIO);
             }
         }
+
+        private function upImage()
+    {
+        $id = $this->dados['id'];
+        $imagem = $this->dadosCorpoRequest['imagem'];
+
+        if ($id && $imagem) {
+            // Faça as validações necessárias para a imagem, se desejar
+       
+                if ($this->UsuariosRepository->updateImage($id, $imagem) > 0) {
+                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                } else {
+                    throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+                }
+            } else {
+                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+            }
+      
+    }
 
 }
