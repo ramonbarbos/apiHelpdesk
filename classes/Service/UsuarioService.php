@@ -144,26 +144,51 @@ class UsuarioService
         return $this->UsuariosRepository->getMySQL()->delete(self::TABELA, $this->dados['id']);
     }
 
-    private function cadastrar(){
+    private function cadastrar() {
         $login = $this->dadosCorpoRequest['login'];
         $senha = $this->dadosCorpoRequest['senha'];
-        if($login && $senha){
-
-            if($this->UsuariosRepository->insertUser( $this->dadosCorpoRequest) > 0){
-
-                $idIserido = $this->UsuariosRepository->getMySQL()->getDb()->lastInsertId();
-                $this->UsuariosRepository->getMySQL()->getDb()->commit();
-                return ['id_inserido' => $idIserido];
-
+    
+        if ($login && $senha) {
+            $cpf = $this->dadosCorpoRequest['cpf'];
+            if ($this->UsuariosRepository->checkExistingUser($cpf, $login)) {
+                return ['Existente'];
             }
-            $this->UsuariosRepository->getMySQL()->getDb()->rollback();
-            throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
+    
+            try {
+              
+    
+                if ($this->UsuariosRepository->insertUser($this->dadosCorpoRequest) > 0) {
+                    $idInserido = $this->UsuariosRepository->getMySQL()->getDb()->lastInsertId();
+                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    return ['id_inserido' => $idInserido];
+                }
+    
+                $this->UsuariosRepository->getMySQL()->getDb()->rollback();
+                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
+            } catch (Exception $e) {
+                $this->UsuariosRepository->getMySQL()->getDb()->rollback();
+                throw $e;
+            }
         }
+    
         throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_SENHA_OBRIGATORIO);
     }
+    
 
     private function atualizar()
     {
+        $cpf = $this->dadosCorpoRequest['cpf'];
+        $login = $this->dadosCorpoRequest['login'];
+        $id = $this->dados['id'];
+    
+        // Verificar se o usuário já existe
+        $usuarioExistente = $this->UsuariosRepository->checkExistingUserUp($cpf, $login);
+        if ($usuarioExistente['cpf'] !== $cpf || $usuarioExistente['login'] !== $login) {
+            return ['Existente'];
+        }else{
+            return ['Nenhum registro afetado!'];
+        }
+
         if ($this->UsuariosRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
             $this->UsuariosRepository->getMySQL()->getDb()->commit();
             return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;

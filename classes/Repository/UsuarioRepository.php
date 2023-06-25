@@ -3,8 +3,7 @@
 namespace Repository;
 
 use DB\MySQL;
-
-
+use PDO;
 
 class UsuarioRepository
 {
@@ -34,9 +33,23 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
+    public function checkExistingUser($cpf, $login) {
+        $consultaExistente = 'SELECT COUNT(*) FROM ' . self::TABELA . ' WHERE cpf = :cpf OR login = :login';
+        $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
+        $stmtExistente->bindParam(':cpf', $cpf);
+        $stmtExistente->bindParam(':login', $login);
+        $stmtExistente->execute();
+    
+        $existe = $stmtExistente->fetchColumn();
+    
+        return $existe > 0;
+    }
+
+    
+
     public function updateUser($id, $dados)
     {
-        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET cpf = :cpf, nome = :nome, sobrenome = :sobrenome, login = :login, senha = :senha, ativo = :ativo, cargo = :cargo, imagem = :imagem WHERE id = :id';
+        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET cpf = :cpf, nome = :nome, sobrenome = :sobrenome, login = :login, senha = :senha, ativo = :ativo, cargo = :cargo WHERE id = :id';
         $this->MySQL->getDb()->beginTransaction();
         $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
         $stmt->bindParam(':id', $id);
@@ -50,6 +63,18 @@ class UsuarioRepository
        
         $stmt->execute();
         return $stmt->rowCount();
+    }
+
+    public function checkExistingUserUp($cpf, $login) {
+        $consultaExistente = 'SELECT cpf, login FROM ' . self::TABELA . ' WHERE cpf = :cpf OR login = :login';
+        $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
+        $stmtExistente->bindParam(':cpf', $cpf);
+        $stmtExistente->bindParam(':login', $login);
+        $stmtExistente->execute();
+    
+        $usuarioExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);
+    
+        return $usuarioExistente;
     }
 
     public function updateImage($id, $imagem)
