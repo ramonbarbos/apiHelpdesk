@@ -2,6 +2,7 @@
 
 namespace Service;
 
+use Exception;
 use InvalidArgumentException;
 use Repository\UsuarioRepository;
 use Util\ConstantesGenericasUtil;
@@ -11,7 +12,7 @@ class UsuarioService
 
 
     public const TABELA = 'usuarios';
-    public const RECURSOS_GET = ['listar'];
+    public const RECURSOS_GET = ['listar', 'fotoperfil'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
     public const RECURSOS_PUT = ['atualizar', 'upimagem'];
@@ -34,8 +35,13 @@ class UsuarioService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_GET, true)) {
 
-           
+            if ($recurso === 'fotoperfil') {
+                $retorno = $this->getImage();
+            
+            }else  {
                 $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
+
+            }
            
 
         } else{
@@ -186,24 +192,81 @@ class UsuarioService
             }
         }
 
-        private function upImage()
-    {
-        $id = $this->dados['id'];
-        $imagem = $this->dadosCorpoRequest['imagem'];
-
-        if ($id && $imagem) {
-            // Faça as validações necessárias para a imagem, se desejar
-       
-                if ($this->UsuariosRepository->updateImage($id, $imagem) > 0) {
-                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
-                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+        public function getImage()
+        {
+            $id = $this->dados['id'];
+        
+            if ($id) {
+                $usuario = $this->UsuariosRepository->getMySQL()->getOneByKey(self::TABELA, $id);
+        
+                if ($usuario && $usuario['imagem']) {
+                    // Defina o caminho completo do diretório de uploads
+                    $diretorioUpload = './classes/Uploads/';
+        
+                    // Verifique se o diretório de uploads existe e tem permissões de leitura
+                    if (!is_dir($diretorioUpload) || !is_readable($diretorioUpload)) {
+                        throw new Exception('O diretório de uploads não existe ou não tem permissões de leitura.');
+                    }
+        
+                    $caminhoImagem = $diretorioUpload . $usuario['imagem'];
+        
+                    if (file_exists($caminhoImagem)) {
+                        // Defina os cabeçalhos CORS adequados
+                        header('Access-Control-Allow-Origin: *');
+                        header('Content-Length: ' . filesize($caminhoImagem));
+        
+                        // Retorne o conteúdo binário da imagem
+                        readfile($caminhoImagem);
+                        exit;
+                    } else {
+                        throw new InvalidArgumentException('A imagem não foi encontrada.');
+                    }
                 } else {
-                    throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+                    throw new InvalidArgumentException('O usuário não foi encontrado ou não possui uma imagem.');
                 }
             } else {
-                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+                throw new InvalidArgumentException('O ID do usuário é obrigatório.');
             }
-      
-    }
+        }
+        
+    
+
+        private function upImage()
+        {
+            $id = $this->dados['id'];
+            $imagem = $this->dadosCorpoRequest['imagem'];
+        
+            if ($id && $imagem) {
+                // Decodifique a string base64 para obter o conteúdo binário da imagem
+                $imageContent = base64_decode($imagem);
+        
+                // Gere um nome único para o arquivo
+                $nomeArquivo = uniqid() . '.jpg';
+        
+                // Defina o caminho completo do diretório de uploads
+                $diretorioUpload = './classes/Uploads/';
+        
+                // Verifique se o diretório de uploads existe e tem permissões de escrita
+                if (!is_dir($diretorioUpload) || !is_writable($diretorioUpload)) {
+                    throw new Exception('O diretório de uploads não existe ou não tem permissões de escrita.');
+                }
+        
+                // Salve o conteúdo binário da imagem no arquivo
+                if (file_put_contents($diretorioUpload . $nomeArquivo, $imageContent) !== false) {
+                    // Aqui você pode salvar os detalhes da imagem no banco de dados
+        
+                    if ($this->UsuariosRepository->updateImage($id, $nomeArquivo) > 0) {
+                        $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                        return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                    } else {
+                        throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+                    }
+                } else {
+                    throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
+                }
+            }
+        }
+        
+        
 
 }
