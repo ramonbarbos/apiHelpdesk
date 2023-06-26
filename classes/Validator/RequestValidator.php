@@ -4,6 +4,7 @@ namespace Validator;
 
 use InvalidArgumentException;
 use Repository\TokensAutorizadosRepository;
+use Service\CategoriaService;
 use Service\EntidadeService;
 use Service\UsuarioService;
 use Util\ConstantesGenericasUtil;
@@ -19,6 +20,7 @@ class RequestValidator
     const DELETE = 'DELETE';
     const USUARIOS = 'USUARIOS';
     const ENTIDADE = 'ENTIDADE';
+    const CATEGORIA = 'CATEGORIA';
 
     public function __construct($request = [])
     {
@@ -72,6 +74,10 @@ class RequestValidator
                     $EntidadeService = new EntidadeService($this->request);
                     $retorno = $EntidadeService->validarGet();
                     break;
+                case self::CATEGORIA:
+                    $CategoriaService = new CategoriaService($this->request);
+                    $retorno = $CategoriaService->validarGet();
+                    break;    
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
             }
@@ -91,6 +97,10 @@ class RequestValidator
                 case self::ENTIDADE:
                     $EntidadeService = new EntidadeService($this->request);
                     $retorno = $EntidadeService->validarDelete();
+                    break;
+                case self::CATEGORIA:
+                    $CategoriaService = new CategoriaService($this->request);
+                    $retorno = $CategoriaService->validarDelete();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -114,6 +124,11 @@ class RequestValidator
                     $EntidadeService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $EntidadeService->validarPost();
                     break;
+                case self::CATEGORIA:
+                    $CategoriaService = new CategoriaService($this->request);
+                    $CategoriaService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $CategoriaService->validarPost();
+                    break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
             }
@@ -135,6 +150,11 @@ class RequestValidator
                     $EntidadeService = new EntidadeService($this->request);
                     $EntidadeService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $EntidadeService->validarPut();
+                    break;
+                case self::CATEGORIA:
+                    $CategoriaService = new CategoriaService($this->request);
+                    $CategoriaService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $CategoriaService->validarPut();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
