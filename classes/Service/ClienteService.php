@@ -4,14 +4,14 @@ namespace Service;
 
 use Exception;
 use InvalidArgumentException;
-use Repository\UsuarioRepository;
+use Repository\ClienteRepository;
 use Util\ConstantesGenericasUtil;
 
-class UsuarioService
+class ClienteService
 {
 
 
-    public const TABELA = 'usuarios';
+    public const TABELA = 'cliente';
     public const RECURSOS_GET = ['listar', 'fotoperfil'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
@@ -22,12 +22,12 @@ class UsuarioService
 
     private array $dadosCorpoRequest;
 
-    private object $UsuariosRepository;
+    private object $ClienteRepository;
 
     public function __construct($dados = [])
     {
         $this->dados = $dados;
-        $this->UsuariosRepository = new UsuarioRepository();
+        $this->ClienteRepository = new ClienteRepository();
     }
 
     public function validarGet(){
@@ -131,42 +131,41 @@ class UsuarioService
     }
 
     private function listar(){
-        return $this->UsuariosRepository->getMySQL()->getAll(self::TABELA);
+        return $this->ClienteRepository->getMySQL()->getAll(self::TABELA);
     }
 
     
     private function getOneByKey()
     {
-        return $this->UsuariosRepository->getMySQL()->getOneByKey(self::TABELA, $this->dados['id']);
+        return $this->ClienteRepository->getMySQL()->getOneByKey(self::TABELA, $this->dados['id']);
     }
 
     private function deletar(){
-        return $this->UsuariosRepository->getMySQL()->delete(self::TABELA, $this->dados['id']);
+        return $this->ClienteRepository->getMySQL()->delete(self::TABELA, $this->dados['id']);
     }
 
     private function cadastrar() {
-        $login = $this->dadosCorpoRequest['login'];
-        $senha = $this->dadosCorpoRequest['senha'];
+        $cpf = $this->dadosCorpoRequest['cpf'];
     
-        if ($login && $senha) {
+        if ($cpf) {
             $cpf = $this->dadosCorpoRequest['cpf'];
-            if ($this->UsuariosRepository->checkExistingUser($cpf, $login)) {
+            if ($this->ClienteRepository->checkExistingUser($cpf)) {
                 return ['Existente'];
             }
     
             try {
               
     
-                if ($this->UsuariosRepository->insertUser($this->dadosCorpoRequest) > 0) {
-                    $idInserido = $this->UsuariosRepository->getMySQL()->getDb()->lastInsertId();
-                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                if ($this->ClienteRepository->insertUser($this->dadosCorpoRequest) > 0) {
+                    $idInserido = $this->ClienteRepository->getMySQL()->getDb()->lastInsertId();
+                    $this->ClienteRepository->getMySQL()->getDb()->commit();
                     return ['id_inserido' => $idInserido];
                 }
     
-                $this->UsuariosRepository->getMySQL()->getDb()->rollback();
+                $this->ClienteRepository->getMySQL()->getDb()->rollback();
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
             } catch (Exception $e) {
-                $this->UsuariosRepository->getMySQL()->getDb()->rollback();
+                $this->ClienteRepository->getMySQL()->getDb()->rollback();
                 throw $e;
             }
         }
@@ -178,26 +177,23 @@ class UsuarioService
     private function atualizar()
     {
         $cpf = $this->dadosCorpoRequest['cpf'];
-        $login = $this->dadosCorpoRequest['login'];
-        $id = $this->dados['id'];
     
         // Verificar se o usuário já existe
-        $usuarioExistente = $this->UsuariosRepository->checkExistingUserUp($cpf, $login);
-        if ($usuarioExistente['cpf'] == $cpf || $usuarioExistente['login'] == $login) {
+        $clienteExistente = $this->ClienteRepository->checkExistingUserUp($cpf);
+        if ($clienteExistente['cpf'] == $cpf  ) {
 
 
-            if ($this->UsuariosRepository->updateUserNoCpf($this->dados['id'], $this->dadosCorpoRequest) > 0) {
-                $this->UsuariosRepository->getMySQL()->getDb()->commit();
+            if ($this->ClienteRepository->updateUserNoCpf($this->dados['id'], $this->dadosCorpoRequest) > 0) {
+                $this->ClienteRepository->getMySQL()->getDb()->commit();
                 return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
             }
-
         }
 
-        if ($this->UsuariosRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
-            $this->UsuariosRepository->getMySQL()->getDb()->commit();
+        if ($this->ClienteRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
+            $this->ClienteRepository->getMySQL()->getDb()->commit();
             return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
         }
-        $this->UsuariosRepository->getMySQL()->getDb()->rollBack();
+        $this->ClienteRepository->getMySQL()->getDb()->rollBack();
         throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
     }
 
@@ -207,11 +203,11 @@ class UsuarioService
             $senha = $this->dadosCorpoRequest['senha'];
 
             if ($login && $senha) {
-                $usuario = $this->UsuariosRepository->loginUser($login, $senha);
+                $usuario = $this->ClienteRepository->loginUser($login, $senha);
 
                 if ($usuario) {
                     // Login válido, prosseguir com o restante do código ou retornar uma resposta adequada
-                    $idIserido = $this->UsuariosRepository->getMySQL()->getDb()->lastInsertId();
+                    $idIserido = $this->ClienteRepository->getMySQL()->getDb()->lastInsertId();
                     return ['mensagem' => 'Login válido','logado' => $usuario['id']];
                 } else {
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_INVALIDO);
@@ -226,7 +222,7 @@ class UsuarioService
             $id = $this->dados['id'];
         
             if ($id) {
-                $usuario = $this->UsuariosRepository->getMySQL()->getOneByKey(self::TABELA, $id);
+                $usuario = $this->ClienteRepository->getMySQL()->getOneByKey(self::TABELA, $id);
         
                 if ($usuario && $usuario['imagem']) {
                     // Defina o caminho completo do diretório de uploads
@@ -284,8 +280,8 @@ class UsuarioService
                 if (file_put_contents($diretorioUpload . $nomeArquivo, $imageContent) !== false) {
                     // Aqui você pode salvar os detalhes da imagem no banco de dados
         
-                    if ($this->UsuariosRepository->updateImage($id, $nomeArquivo) > 0) {
-                        $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    if ($this->ClienteRepository->updateImage($id, $nomeArquivo) > 0) {
+                        $this->ClienteRepository->getMySQL()->getDb()->commit();
                         return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
                     } else {
                         throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);

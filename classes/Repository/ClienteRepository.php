@@ -5,10 +5,10 @@ namespace Repository;
 use DB\MySQL;
 use PDO;
 
-class UsuarioRepository
+class ClienteRepository
 {
     private object $MySQL;
-    public const TABELA = 'usuarios';
+    public const TABELA = 'cliente';
 
     /**
      * UsuariosRepository constructor.
@@ -18,10 +18,9 @@ class UsuarioRepository
         $this->MySQL = new MySQL();
     }
 
- 
-
+    
     public function insertUser($dados){
-        $campos = array('cpf', 'nome', 'sobrenome', 'login','senha', 'ativo','cargo');
+        $campos = array('cpf', 'nome', 'sobrenome', 'entidade','imagem');
         $valores = array();
     
         $consultaInsert = 'INSERT INTO ' . self::TABELA . ' (' . implode(',', $campos) . ') VALUES (:' . implode(',:', $campos) . ')';
@@ -36,69 +35,82 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
-    public function checkExistingUser($cpf, $login) {
-        $consultaExistente = 'SELECT COUNT(*) FROM ' . self::TABELA . ' WHERE cpf = :cpf OR login = :login';
+    public function checkExistingUser($cpf) {
+        $consultaExistente = 'SELECT COUNT(*) FROM ' . self::TABELA . ' WHERE cpf = :cpf';
         $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
         $stmtExistente->bindParam(':cpf', $cpf);
-        $stmtExistente->bindParam(':login', $login);
         $stmtExistente->execute();
     
         $existe = $stmtExistente->fetchColumn();
     
         return $existe > 0;
     }
-  
+
+    
     public function updateUser($id, $dados)
     {
-        $campos = array( 'cpf','nome', 'sobrenome', 'login','senha', 'ativo', 'cargo');
+        $campos = array('cpf', 'nome', 'sobrenome', 'entidade','imagem');
         $valores = array();
+    
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
+    
         foreach ($campos as $campo) {
             $consultaUpdate .= $campo . ' = :' . $campo . ', ';
             $valores[':' . $campo] = $dados[$campo];
         }
+    
         $consultaUpdate = rtrim($consultaUpdate, ', ') . ' WHERE id = :id';
+    
         $this->MySQL->getDb()->beginTransaction();
         $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+    
         foreach ($valores as $campo => $valor) {
             $stmt->bindValue($campo, $valor);
         }
+    
         $stmt->bindValue(':id', $id);
+    
         $stmt->execute();
+    
         return $stmt->rowCount();
     }
-
-
     public function updateUserNoCpf($id, $dados)
     {
-        $campos = array( 'nome', 'sobrenome', 'login','senha', 'ativo', 'cargo');
+        $campos = array( 'nome', 'sobrenome', 'entidade','imagem');
         $valores = array();
+    
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
+    
         foreach ($campos as $campo) {
             $consultaUpdate .= $campo . ' = :' . $campo . ', ';
             $valores[':' . $campo] = $dados[$campo];
         }
+    
         $consultaUpdate = rtrim($consultaUpdate, ', ') . ' WHERE id = :id';
+    
         $this->MySQL->getDb()->beginTransaction();
         $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+    
         foreach ($valores as $campo => $valor) {
             $stmt->bindValue($campo, $valor);
         }
+    
         $stmt->bindValue(':id', $id);
+    
         $stmt->execute();
+    
         return $stmt->rowCount();
     }
 
-    public function checkExistingUserUp($cpf, $login) {
-        $consultaExistente = 'SELECT cpf, login FROM ' . self::TABELA . ' WHERE cpf = :cpf OR login = :login';
+    public function checkExistingUserUp($cpf) {
+        $consultaExistente = 'SELECT cpf FROM ' . self::TABELA . ' WHERE cpf = :cpf';
         $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
         $stmtExistente->bindParam(':cpf', $cpf);
-        $stmtExistente->bindParam(':login', $login);
         $stmtExistente->execute();
     
-        $usuarioExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);
+        $clienteExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);
     
-        return $usuarioExistente;
+        return $clienteExistente;
     }
 
     public function updateImage($id, $imagem)
