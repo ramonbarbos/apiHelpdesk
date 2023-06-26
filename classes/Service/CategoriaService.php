@@ -159,7 +159,13 @@ class CategoriaService
 
     private function atualizar()
     {
-       
+        $nome = $this->dadosCorpoRequest['nome'];
+
+
+        $entidadeExistente = $this->CategoriaRepository->checkExistingCat($nome);
+        if ( $entidadeExistente['nome'] == $nome) {
+            return ['Nenhum registro afetado!'];
+        }
     
         if ($this->CategoriaRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
             $this->CategoriaRepository->getMySQL()->getDb()->commit();
