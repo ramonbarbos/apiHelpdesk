@@ -134,6 +134,31 @@ class EntidadeService
     }
 
     private function cadastrar() {
+
+        $payload = file_get_contents('php://input');
+    
+        // Decodifica o JSON para obter os dados
+        $dados = json_decode($payload, true);
+    
+        // Verifica se o JSON foi decodificado com sucesso
+        if ($dados === null) {
+            // Erro na decodificação do JSON
+            return ['Erro ao decodificar o JSON'];
+        }
+    
+        // Acessa o valor do campo "ibge" no JSON
+        $ibge = $dados['ibge'];
+        $nome = $this->dadosCorpoRequest['nome'];
+    
+        // Verifica o tamanho do campo "ibge"
+        if (strlen($ibge) > 7) {
+            return ['Limite de dígitos do IBGE excedido'];
+        }
+
+        $entidadeExistente = $this->EntidadeRepository->checkExistingEnti($ibge);
+        if ($entidadeExistente['ibge'] == $ibge || $entidadeExistente['nome'] == $nome) {
+            return ['Nenhum registro afetado!'];
+        }
       
             if($this->EntidadeRepository->insertUser( $this->dadosCorpoRequest) > 0){
 
