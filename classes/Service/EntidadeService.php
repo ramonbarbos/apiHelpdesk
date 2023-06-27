@@ -197,16 +197,50 @@ class EntidadeService
             return ['Limite de dígitos do IBGE excedido'];
         }
     
-        $entidadeExistente = $this->EntidadeRepository->checkExistingEnti($ibge);
-        if ($entidadeExistente['ibge'] == $ibge || $entidadeExistente['nome'] == $nome) {
-            return ['Nenhum registro afetado!'];
-        }
+       
+        $entidadeExistente = $this->EntidadeRepository->checkExistingEnti($ibge, $nome);
+      
+        switch (true) {
+            case $entidadeExistente['nome'] == $nome:
+
+                $data = [
+                    'ibge' => $this->dadosCorpoRequest['ibge'],
+                ];
+
+                if (!$this->EntidadeRepository->getMySQL()->getDb()->inTransaction()) {
+                    if ($this->EntidadeRepository->updateUser($this->dados['id'],  $data) > 0) {
+                        $this->EntidadeRepository->getMySQL()->getDb()->commit();
+                        return  ['Nome ja existente!'];
+                    }
+                }
+                break;
+                
+            case $entidadeExistente['ibge'] == $ibge :
+                $data = [
+                    'nome' => $this->dadosCorpoRequest['nome']
+                ];
+                if (!$this->EntidadeRepository->getMySQL()->getDb()->inTransaction()) {
+                    if ($this->EntidadeRepository->updateUser($this->dados['id'],  $data) > 0) {
+                        $this->EntidadeRepository->getMySQL()->getDb()->commit();
+                        return  ['IBGE ja existente!'];
+                    }
+                }
+                break;
+                    
     
-        if ($this->EntidadeRepository->updateUser($this->dados['id'], $dados) > 0) {
-            $this->EntidadeRepository->getMySQL()->getDb()->commit();
-            return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+            default:
+                if (!$this->EntidadeRepository->getMySQL()->getDb()->inTransaction()) {
+                    if ($this->EntidadeRepository->updateUser($this->dados['id'],  $this->dadosCorpoRequest) > 0) {
+                        $this->EntidadeRepository->getMySQL()->getDb()->commit();
+                        return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                    }
+                }
+        
+                break;
         }
-    
+        
+
+        
         $this->EntidadeRepository->getMySQL()->getDb()->rollBack();
         throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
     }
