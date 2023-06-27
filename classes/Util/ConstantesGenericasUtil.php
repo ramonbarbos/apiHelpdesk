@@ -6,10 +6,10 @@ abstract class ConstantesGenericasUtil
 {
     /* REQUESTS */
     public const TIPO_REQUEST = ['GET', 'POST', 'DELETE', 'PUT'];
-    public const TIPO_GET = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE'];
-    public const TIPO_POST = ['USUARIOS','ENTIDADE','CATEGORIA', 'CLIENTE'];
-    public const TIPO_DELETE = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE'];
-    public const TIPO_PUT = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE'];
+    public const TIPO_GET = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO'];
+    public const TIPO_POST = ['USUARIOS','ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO'];
+    public const TIPO_DELETE = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO'];
+    public const TIPO_PUT = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO'];
     
 
     /* ERROS */
