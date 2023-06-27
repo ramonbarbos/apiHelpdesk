@@ -177,21 +177,37 @@ class ClienteService
     
         // Verificar se o usuário já existe
         $clienteExistente = $this->ClienteRepository->checkExistingUserUp($cpf);
-        if ($clienteExistente['cpf'] === $cpf  ) {
+       
+        switch (true) {
+            case $clienteExistente['cpf'] === $cpf :
 
+                $data = [
+                    'cpf' => $this->dadosCorpoRequest['cpf'],
+                    'nome' => $this->dadosCorpoRequest['nome'],
+                    'sobrenome' => $this->dadosCorpoRequest['sobrenome'],
+                    'entidade' => $this->dadosCorpoRequest['entidade'],
+                ];
 
-            if ($this->ClienteRepository->updateUserNoCpf($this->dados['id'], $this->dadosCorpoRequest) > 0) {
-                $this->ClienteRepository->getMySQL()->getDb()->commit();
-                return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
-            }
+                if (!$this->ClienteRepository->getMySQL()->getDb()->inTransaction()) {
+                    if ($this->ClienteRepository->updateUser($this->dados['id'],  $data) > 0) {
+                        $this->ClienteRepository->getMySQL()->getDb()->commit();
+                        return  ['CPF ja existente!'];
+                    }
+                }
+                break;    
+            default:
+                if ($this->ClienteRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
+                    $this->ClienteRepository->getMySQL()->getDb()->commit();
+                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                }
+        
+                break;
         }
+        
 
-        if ($this->ClienteRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
-            $this->ClienteRepository->getMySQL()->getDb()->commit();
-            return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
-        }
+      
         $this->ClienteRepository->getMySQL()->getDb()->rollBack();
-        throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+        return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
     }
 
     public function validarLogin()

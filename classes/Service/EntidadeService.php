@@ -227,7 +227,11 @@ class EntidadeService
                 }
                 break;
                     
-    
+            case $entidadeExistente['ibge'] == $ibge && $entidadeExistente['nome'] == $nome  :
+                    return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
+
+                break;
+                        
             default:
                 if (!$this->EntidadeRepository->getMySQL()->getDb()->inTransaction()) {
                     if ($this->EntidadeRepository->updateUser($this->dados['id'],  $this->dadosCorpoRequest) > 0) {
@@ -242,7 +246,7 @@ class EntidadeService
 
         
         $this->EntidadeRepository->getMySQL()->getDb()->rollBack();
-        throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO);
+        return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
     }
     
 
