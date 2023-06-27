@@ -20,7 +20,7 @@ class ClienteRepository
 
     
     public function insertUser($dados){
-        $campos = array('cpf', 'nome', 'sobrenome', 'entidade','imagem');
+        $campos = array('cpf', 'nome', 'sobrenome', 'entidade');
         $valores = array();
     
         $consultaInsert = 'INSERT INTO ' . self::TABELA . ' (' . implode(',', $campos) . ') VALUES (:' . implode(',:', $campos) . ')';
@@ -49,7 +49,7 @@ class ClienteRepository
     
     public function updateUser($id, $dados)
     {
-        $campos = array('cpf', 'nome', 'sobrenome', 'entidade','imagem');
+        $campos = array('cpf', 'nome', 'sobrenome', 'entidade');
         $valores = array();
     
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
@@ -76,7 +76,7 @@ class ClienteRepository
     }
     public function updateUserNoCpf($id, $dados)
     {
-        $campos = array( 'nome', 'sobrenome', 'entidade','imagem');
+        $campos = array( 'nome', 'sobrenome', 'entidade');
         $valores = array();
     
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';

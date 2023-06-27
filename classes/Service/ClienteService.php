@@ -148,13 +148,13 @@ class ClienteService
         $cpf = $this->dadosCorpoRequest['cpf'];
     
         if ($cpf) {
+
             $cpf = $this->dadosCorpoRequest['cpf'];
+
+
             if ($this->ClienteRepository->checkExistingUser($cpf)) {
                 return ['Existente'];
             }
-    
-            try {
-              
     
                 if ($this->ClienteRepository->insertUser($this->dadosCorpoRequest) > 0) {
                     $idInserido = $this->ClienteRepository->getMySQL()->getDb()->lastInsertId();
@@ -164,10 +164,7 @@ class ClienteService
     
                 $this->ClienteRepository->getMySQL()->getDb()->rollback();
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
-            } catch (Exception $e) {
-                $this->ClienteRepository->getMySQL()->getDb()->rollback();
-                throw $e;
-            }
+           
         }
     
         throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_SENHA_OBRIGATORIO);
@@ -180,7 +177,7 @@ class ClienteService
     
         // Verificar se o usuário já existe
         $clienteExistente = $this->ClienteRepository->checkExistingUserUp($cpf);
-        if ($clienteExistente['cpf'] == $cpf  ) {
+        if ($clienteExistente['cpf'] === $cpf  ) {
 
 
             if ($this->ClienteRepository->updateUserNoCpf($this->dados['id'], $this->dadosCorpoRequest) > 0) {

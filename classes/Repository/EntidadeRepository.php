@@ -66,10 +66,11 @@ class EntidadeRepository
         return $stmt->rowCount();
     }
     
-    public function checkExistingEnti( $ibge) {
-        $consultaExistente = 'SELECT ibge FROM ' . self::TABELA . ' WHERE ibge = :ibge';
+    public function checkExistingEnti( $ibge, $nome) {
+        $consultaExistente = 'SELECT ibge, nome FROM ' . self::TABELA . ' WHERE ibge = :ibge, nome = :nome';
         $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
         $stmtExistente->bindParam(':ibge', $ibge);
+        $stmtExistente->bindParam(':nome', $nome);
         $stmtExistente->execute();
 
         $usuarioExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);

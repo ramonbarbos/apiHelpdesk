@@ -147,11 +147,12 @@ class EntidadeService
         }
     
         // Acessa o valor do campo "ibge" no JSON
-        $ibge = $dados['ibge'];
+        $ibgecont = $dados['ibge'];
         $nome = $this->dadosCorpoRequest['nome'];
+        $ibge = $this->dadosCorpoRequest['ibge'];
     
         // Verifica o tamanho do campo "ibge"
-        if (strlen($ibge) > 7) {
+        if (strlen($ibgecont) > 7) {
             return ['Limite de dígitos do IBGE excedido'];
         }
 

@@ -48,6 +48,7 @@ class UsuarioRepository
         return $existe > 0;
     }
   
+    //Se o login e o CPF existir, atualizar todos
     public function updateUser($id, $dados)
     {
         $campos = array( 'cpf','nome', 'sobrenome', 'login','senha', 'ativo', 'cargo');
@@ -68,10 +69,10 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
-
+    //Se o CPF ou Login não existe, então atualizar SEM
     public function updateUserNoCpf($id, $dados)
     {
-        $campos = array( 'nome', 'sobrenome', 'login','senha', 'ativo', 'cargo');
+        $campos = array( 'nome', 'sobrenome','senha', 'ativo', 'cargo');
         $valores = array();
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
         foreach ($campos as $campo) {
