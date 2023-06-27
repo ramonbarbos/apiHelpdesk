@@ -25,11 +25,15 @@ abstract class ConstantesGenericasUtil
     /* SUCESSO */
     public const MSG_DELETADO_SUCESSO = 'Registro deletado com Sucesso!';
     public const MSG_ATUALIZADO_SUCESSO = 'Registro atualizado com Sucesso!';
+    public const MSG_ATUALIZADO_SUCESSO_CPF = 'Registro atualizado. CPF Existente!';
+    public const MSG_ATUALIZADO_SUCESSO_LOGIN = 'Registro atualizado. LOGIN Existente!';
 
     /* RECURSO USUARIOS */
     public const MSG_ERRO_ID_OBRIGATORIO = 'ID e obrigatorio!';
-    public const MSG_ERRO_LOGIN_EXISTENTE = 'Login ja existente!';
     public const MSG_ERRO_LOGIN_INVALIDO = 'Esse Login nao existe';
+    public const MSG_ERRO_LOGIN_EXISTENTE = 'Login ja existente!';
+    public const MSG_ERRO_CPF_EXISTENTE = 'CPF ja existente!';
+    public const MSG_ERRO_CPF_LOGIN_EXISTENTE = 'CPF e Login ja existente!';
     
     public const MSG_ERRO_LOGIN_SENHA_OBRIGATORIO = 'Login e Senha sao obrigatorios!';
 

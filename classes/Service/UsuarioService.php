@@ -181,29 +181,73 @@ class UsuarioService
         $login = $this->dadosCorpoRequest['login'];
     
         // Verificar se o usuário já existe
-        $usuarioExistente = $this->UsuariosRepository->checkExistingUserUp($cpf, $login);
-        if ($usuarioExistente['cpf'] == $cpf || $usuarioExistente['login'] == $login) {
+        $cpfExistente = $this->UsuariosRepository->checkExistingCpfUp($cpf);
+        $loginExistente = $this->UsuariosRepository->checkExistingLoginUp( $login);
+        $existe = $this->UsuariosRepository->checkExistingUser( $cpf, $login);
+        
 
-              // Verificar se já existe uma transação ativa
-            if (!$this->UsuariosRepository->getMySQL()->getDb()->inTransaction()) {
-                 //Se o CPF ou Login não existe, então atualizar SEM
-                if ($this->UsuariosRepository->updateUserNoCpf($this->dados['id'], $this->dadosCorpoRequest) > 0) {
+        switch (true) {
+            
+            case $cpfExistente['cpf'] == $cpf && $loginExistente['login'] == $login  :
+                $data = [
+                    'nome' => $this->dadosCorpoRequest['nome'],
+                    'sobrenome' => $this->dadosCorpoRequest['sobrenome'],
+                    'senha' => $this->dadosCorpoRequest['senha'],
+                    'ativo' => $this->dadosCorpoRequest['ativo'],
+                    'cargo' => $this->dadosCorpoRequest['cargo']
+                ];
+        
+                if ($this->UsuariosRepository->updateUser($this->dados['id'], $data) > 0) {
                     $this->UsuariosRepository->getMySQL()->getDb()->commit();
-                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                    return  ConstantesGenericasUtil::MSG_ERRO_CPF_LOGIN_EXISTENTE;
                 }
-            }           
-                    
-
+                break;
+                
+            case $loginExistente['login'] == $login && $existe == 1:
+                $data = [
+                    'nome' => $this->dadosCorpoRequest['nome'],
+                    'sobrenome' => $this->dadosCorpoRequest['sobrenome'],
+                    'cpf' => $this->dadosCorpoRequest['cpf'],
+                    'senha' => $this->dadosCorpoRequest['senha'],
+                    'ativo' => $this->dadosCorpoRequest['ativo'],
+                    'cargo' => $this->dadosCorpoRequest['cargo']
+                ];
+        
+                if ($this->UsuariosRepository->updateUser($this->dados['id'], $data) > 0) {
+                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    return ConstantesGenericasUtil::MSG_ERRO_LOGIN_EXISTENTE;
+                }
+                break;
+                
+            case $cpfExistente['cpf'] == $cpf && $existe == 1:
+                $data = [
+                    'nome' => $this->dadosCorpoRequest['nome'],
+                    'sobrenome' => $this->dadosCorpoRequest['sobrenome'],
+                    'login' => $this->dadosCorpoRequest['login'],
+                    'senha' => $this->dadosCorpoRequest['senha'],
+                    'ativo' => $this->dadosCorpoRequest['ativo'],
+                    'cargo' => $this->dadosCorpoRequest['cargo']
+                ];
+        
+                if ($this->UsuariosRepository->updateUser($this->dados['id'], $data) > 0) {
+                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    return  ConstantesGenericasUtil::MSG_ERRO_CPF_EXISTENTE;
+                }
+                break;
+            
+                
+            default:
+                // Verificar se já existe uma transação ativa
+                if (!$this->UsuariosRepository->getMySQL()->getDb()->inTransaction()) {
+                    // Se o login e o CPF não existirem, atualizar todos os dados
+                    if ($this->UsuariosRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
+                        $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                        return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                    }
+                }
+                break;
         }
-
-          // Verificar se já existe uma transação ativa
-        if (!$this->UsuariosRepository->getMySQL()->getDb()->inTransaction()) {
-             //Se o login e o CPF existir, atualizar todos
-            if ($this->UsuariosRepository->updateUser($this->dados['id'], $this->dadosCorpoRequest) > 0) {
-                $this->UsuariosRepository->getMySQL()->getDb()->commit();
-                return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
-            }
-        }
+        
         //Se não atualizar nada encerrará a trasição
         $this->UsuariosRepository->getMySQL()->getDb()->rollBack();
         return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;

@@ -44,30 +44,37 @@ class UsuarioRepository
         $stmtExistente->execute();
     
         $existe = $stmtExistente->fetchColumn();
-    
+        
         return $existe > 0;
     }
+    
   
     //Se o login e o CPF existir, atualizar todos
     public function updateUser($id, $dados)
     {
-        $campos = array( 'cpf','nome', 'sobrenome', 'login','senha', 'ativo', 'cargo');
+        $campos = array_keys($dados);
         $valores = array();
         $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
+        
         foreach ($campos as $campo) {
             $consultaUpdate .= $campo . ' = :' . $campo . ', ';
             $valores[':' . $campo] = $dados[$campo];
         }
+        
         $consultaUpdate = rtrim($consultaUpdate, ', ') . ' WHERE id = :id';
         $this->MySQL->getDb()->beginTransaction();
         $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+        
         foreach ($valores as $campo => $valor) {
             $stmt->bindValue($campo, $valor);
         }
+        
         $stmt->bindValue(':id', $id);
         $stmt->execute();
+        
         return $stmt->rowCount();
     }
+    
 
     //Se o CPF ou Login não existe, então atualizar SEM
     public function updateUserNoCpf($id, $dados)
@@ -90,10 +97,19 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
-    public function checkExistingUserUp($cpf, $login) {
-        $consultaExistente = 'SELECT cpf, login FROM ' . self::TABELA . ' WHERE cpf = :cpf OR login = :login';
+    public function checkExistingCpfUp($cpf) {
+        $consultaExistente = 'SELECT cpf FROM ' . self::TABELA . ' WHERE cpf = :cpf ';
         $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
         $stmtExistente->bindParam(':cpf', $cpf);
+        $stmtExistente->execute();
+    
+        $usuarioExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);
+    
+        return $usuarioExistente;
+    }
+    public function checkExistingLoginUp($login) {
+        $consultaExistente = 'SELECT login FROM ' . self::TABELA . ' WHERE login = :login';
+        $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
         $stmtExistente->bindParam(':login', $login);
         $stmtExistente->execute();
     
