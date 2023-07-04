@@ -59,16 +59,30 @@ class ChamadoRepository
         return $stmt->rowCount();
     }
     
-    public function checkExistingEnti( $ibge, $nome) {
-        $consultaExistente = 'SELECT ibge, nome FROM ' . self::TABELA . ' WHERE ibge = :ibge OR nome = :nome';
-        $stmtExistente = $this->MySQL->getDb()->prepare($consultaExistente);
-        $stmtExistente->bindParam(':ibge', $ibge);
-        $stmtExistente->bindParam(':nome', $nome);
-        $stmtExistente->execute();
+  
 
-        $usuarioExistente = $stmtExistente->fetch(PDO::FETCH_ASSOC);
+    public function selectAberto() {
+        $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE status = :status';
+        $stmt = $this->MySQL->getDb()->prepare($consulta);
+        $stmt->bindValue(':status', 'a');
     
-        return $usuarioExistente;
+        
+            $stmt->execute();
+            $chamadoAberto = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $chamadoAberto;
+     
+    }
+
+    public function selectFechado() {
+        $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE status = :status';
+        $stmt = $this->MySQL->getDb()->prepare($consulta);
+        $stmt->bindValue(':status', 'f');
+    
+        
+            $stmt->execute();
+            $chamadoAberto = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $chamadoAberto;
+     
     }
 
     public function getMySQL()

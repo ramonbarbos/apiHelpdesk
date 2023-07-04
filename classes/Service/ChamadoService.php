@@ -12,11 +12,10 @@ class ChamadoService
 
 
     public const TABELA = 'chamado';
-    public const RECURSOS_GET = ['listar'];
+    public const RECURSOS_GET = ['listar', 'aberto', 'fechado'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
     public const RECURSOS_PUT = ['atualizar'];
-    public const RECURSOS_LOGIN = ['login'];
 
     private array $dados;
 
@@ -36,7 +35,16 @@ class ChamadoService
         if (in_array($recurso, self::RECURSOS_GET, true)) {
 
        
+            if ($recurso === 'aberto') {
+                $retorno = $this->getAberto();
+            
+            }else if($recurso === 'fechado') {
+                $retorno = $this->getFechado();
+                
+            }else {
                 $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
+
+            }
 
            
 
@@ -122,7 +130,12 @@ class ChamadoService
     private function listar(){
         return $this->ChamadoRepository->getMySQL()->getAll(self::TABELA);
     }
-
+    private function getAberto(){
+        return  $this->ChamadoRepository->selectAberto();
+    }
+    private function getFechado(){
+        return  $this->ChamadoRepository->selectFechado();
+    }
     
     private function getOneByKey()
     {

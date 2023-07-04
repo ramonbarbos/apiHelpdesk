@@ -113,27 +113,18 @@ class ClienteRepository
         return $clienteExistente;
     }
 
-    public function updateImage($id, $imagem)
-    {
-        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET imagem = :imagem WHERE id = :id';
-        $this->MySQL->getDb()->beginTransaction();
-        $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':imagem', $imagem);
-        $stmt->execute();
-        return $stmt->rowCount();
-    }
     
-    public function loginUser($login, $senha){
-        $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE login = :login AND senha = :senha AND ativo = "s" ';
+    
+    public function consulEntidade($id){
+        $consulta = 'SELECT entidade FROM ' . self::TABELA . ' WHERE id = :id ';
         $stmt = $this->MySQL->getDb()->prepare($consulta);
-        $stmt->bindParam(':login', $login);
-        $stmt->bindParam(':senha', $senha);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
         
         return $stmt->fetch();
 
     }
+
     public function getMySQL()
     {
         return $this->MySQL;
