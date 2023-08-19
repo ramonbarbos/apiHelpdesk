@@ -15,7 +15,7 @@ class ChamadoService
     public const RECURSOS_GET = ['listar', 'aberto', 'fechado'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
-    public const RECURSOS_PUT = ['atualizar'];
+    public const RECURSOS_PUT = ['atualizar', 'upstatus'];
 
     private array $dados;
 
@@ -104,7 +104,13 @@ class ChamadoService
         if (in_array($recurso, self::RECURSOS_PUT, true)) {
             if ($this->dados['id'] > 0) {
 
-                        $retorno = $this->$recurso();
+                if ($recurso === 'upstatus') {
+                    $retorno = $this->putStatus();
+                
+                }else{
+                    $retorno = $this->$recurso();
+
+                }
                     
             } else {
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_ID_OBRIGATORIO);
@@ -212,7 +218,30 @@ class ChamadoService
         return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
     }
     
+    private function putStatus()
+    {
+        $status = $this->dadosCorpoRequest['status'];
 
+       
+
+        $data = [
+            'status' => $this->dadosCorpoRequest['status'],
+        ];
+
+        if($status){
+            if (!$this->ChamadoRepository->getMySQL()->getDb()->inTransaction()) {
+                if ($this->ChamadoRepository->updateStatus($this->dados['id'],  $data) > 0) {
+                    $this->ChamadoRepository->getMySQL()->getDb()->commit();
+                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+
+                }
+            }
+        }
+
+        
+        $this->ChamadoRepository->getMySQL()->getDb()->rollBack();
+        return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
+    }
  
       
         

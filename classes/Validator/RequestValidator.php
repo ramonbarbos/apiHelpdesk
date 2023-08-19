@@ -4,6 +4,7 @@ namespace Validator;
 
 use InvalidArgumentException;
 use Repository\TokensAutorizadosRepository;
+use Service\AcompanhamentoService;
 use Service\CategoriaService;
 use Service\ChamadoService;
 use Service\ClienteService;
@@ -25,6 +26,7 @@ class RequestValidator
     const CATEGORIA = 'CATEGORIA';
     const CLIENTE = 'CLIENTE';
     const CHAMADO = 'CHAMADO';
+    const ACOMPANHAMENTO = 'ACOMPANHAMENTO';
 
     public function __construct($request = [])
     {
@@ -89,6 +91,10 @@ class RequestValidator
                 case self::CHAMADO:
                     $ChamadoService = new ChamadoService($this->request);
                     $retorno = $ChamadoService->validarGet();
+                    break;  
+                case self::ACOMPANHAMENTO:
+                    $AcompanhamentoService = new AcompanhamentoService($this->request);
+                    $retorno = $AcompanhamentoService->validarGet();
                     break;   
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -121,6 +127,10 @@ class RequestValidator
                 case self::CHAMADO:
                     $ChamadoService = new ChamadoService($this->request);
                     $retorno = $ChamadoService->validarDelete();
+                    break;
+                case self::ACOMPANHAMENTO:
+                    $AcompanhamentoService = new AcompanhamentoService($this->request);
+                    $retorno = $AcompanhamentoService->validarDelete();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -159,6 +169,11 @@ class RequestValidator
                     $ChamadoService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $ChamadoService->validarPost();
                     break;
+                case self::ACOMPANHAMENTO:
+                    $AcompanhamentoService = new AcompanhamentoService($this->request);
+                    $AcompanhamentoService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $AcompanhamentoService->validarPost();
+                    break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
             }
@@ -195,6 +210,11 @@ class RequestValidator
                     $ChamadoService = new ChamadoService($this->request);
                     $ChamadoService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $ChamadoService->validarPut();
+                    break;
+                case self::ACOMPANHAMENTO:
+                    $AcompanhamentoService = new AcompanhamentoService($this->request);
+                    $AcompanhamentoService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $AcompanhamentoService->validarPut();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);

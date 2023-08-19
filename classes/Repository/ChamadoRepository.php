@@ -4,6 +4,8 @@ namespace Repository;
 
 use DB\MySQL;
 use PDO;
+use PDOException;
+use Util\ConstantesGenericasUtil;
 
 class ChamadoRepository
 {
@@ -74,16 +76,50 @@ class ChamadoRepository
     }
 
     public function selectFechado() {
+
+        
         $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE status = :status';
         $stmt = $this->MySQL->getDb()->prepare($consulta);
         $stmt->bindValue(':status', 'f');
     
-        
+
+           try {
             $stmt->execute();
             $chamadoAberto = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $chamadoAberto;
+            } catch (PDOException $e) {
+                     return ConstantesGenericasUtil::MSG_ERRO_SEM_RETORNO;
+            }
      
     }
+
+
+    public function updateStatus($id, $dados)
+    {
+        $campos = array_keys($dados);
+        $valores = array();
+        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET ';
+        
+        foreach ($campos as $campo) {
+            $consultaUpdate .= $campo . ' = :' . $campo . ', ';
+            $valores[':' . $campo] = $dados[$campo];
+        }
+        
+        $consultaUpdate = rtrim($consultaUpdate, ', ') . ' WHERE id = :id';
+        $this->MySQL->getDb()->beginTransaction();
+        $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+        
+        foreach ($valores as $campo => $valor) {
+            $stmt->bindValue($campo, $valor);
+        }
+        
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
+        
+        return $stmt->rowCount();
+    }
+    
+  
 
     public function getMySQL()
     {
