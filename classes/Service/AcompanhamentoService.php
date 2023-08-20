@@ -12,7 +12,7 @@ class AcompanhamentoService
 
 
     public const TABELA = 'acompanhamento';
-    public const RECURSOS_GET = ['listar'];
+    public const RECURSOS_GET = ['listar', 'mensagem'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
     public const RECURSOS_PUT = ['atualizar'];
@@ -34,9 +34,13 @@ class AcompanhamentoService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_GET, true)) {
 
-    
+            if ($recurso === 'mensagem') {
+                $retorno = $this->getMensagem();
+            
+            }else  {
                 $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
 
+            }
            
            
 
@@ -137,16 +141,17 @@ class AcompanhamentoService
 
     private function cadastrar() {
 
-        $titulo = $this->dadosCorpoRequest['titulo'];
+        $mensagem = $this->dadosCorpoRequest['mensagem'];
 
         $data = [
+            'usuario_id' => $this->dadosCorpoRequest['usuario_id'],
             'usuario_acompanhamento' => $this->dadosCorpoRequest['usuario_acompanhamento'],
             'mensagem' => $this->dadosCorpoRequest['mensagem'],
             'chamado_id' => $this->dadosCorpoRequest['chamado_id'],
           
         ];
 
-        if($titulo){
+        if($mensagem){
             if (!$this->AcompanhamentoRepository->getMySQL()->getDb()->inTransaction()) {
                
                 if ($this->AcompanhamentoRepository->insertUser( $data) > 0) {
@@ -165,7 +170,7 @@ class AcompanhamentoService
 
     private function atualizar()
     {
-        $titulo = $this->dadosCorpoRequest['titulo'];
+        $mensagem = $this->dadosCorpoRequest['mensagem'];
 
         $data = [
             'usuario_acompanhamento' => $this->dadosCorpoRequest['usuario_acompanhamento'],
@@ -173,7 +178,7 @@ class AcompanhamentoService
             'chamado_id' => $this->dadosCorpoRequest['chamado_id'],
         ];
 
-        if($titulo){
+        if($mensagem){
             if (!$this->AcompanhamentoRepository->getMySQL()->getDb()->inTransaction()) {
                 if ($this->AcompanhamentoRepository->updateUser($this->dados['id'],  $data) > 0) {
                     $this->AcompanhamentoRepository->getMySQL()->getDb()->commit();
@@ -188,7 +193,24 @@ class AcompanhamentoService
         return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
     }
     
-  
+    public function getMensagem()
+    {
+        $id = $this->dados['id'];
+
+        if ($id) {
+            $consulMensagem = $this->AcompanhamentoRepository->consulMensagem($id);
+
+            if ($consulMensagem) {
+                return $consulMensagem;
+                
+
+            } else {
+                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_INVALIDO);
+            }
+        } else {
+            throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_SENHA_OBRIGATORIO);
+        }
+    }
  
       
         

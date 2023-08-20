@@ -61,7 +61,15 @@ class AcompanhamentoRepository
         return $stmt->rowCount();
     }
     
-  
+    public function consulMensagem($id){
+        $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE chamado_id = :id ';
+        $stmt = $this->MySQL->getDb()->prepare($consulta);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        
+        return $stmt->fetchAll();
+
+    }
 
   
 
