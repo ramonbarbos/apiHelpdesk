@@ -9,6 +9,7 @@ use Service\CategoriaService;
 use Service\ChamadoService;
 use Service\ClienteService;
 use Service\EntidadeService;
+use Service\SalaService;
 use Service\UsuarioService;
 use Util\ConstantesGenericasUtil;
 use Util\JsonUtil;
@@ -22,11 +23,8 @@ class RequestValidator
     const GET = 'GET';
     const DELETE = 'DELETE';
     const USUARIOS = 'USUARIOS';
-    const ENTIDADE = 'ENTIDADE';
-    const CATEGORIA = 'CATEGORIA';
-    const CLIENTE = 'CLIENTE';
-    const CHAMADO = 'CHAMADO';
-    const ACOMPANHAMENTO = 'ACOMPANHAMENTO';
+    const SALAS = 'SALAS';
+   
 
     public function __construct($request = [])
     {
@@ -76,26 +74,10 @@ class RequestValidator
                     $UsuariosService = new UsuarioService($this->request);
                     $retorno = $UsuariosService->validarGet();
                     break;
-                case self::ENTIDADE:
-                    $EntidadeService = new EntidadeService($this->request);
-                    $retorno = $EntidadeService->validarGet();
+                 case self::SALAS:
+                    $SalaService = new SalaService($this->request);
+                    $retorno = $SalaService->validarGet();
                     break;
-                case self::CATEGORIA:
-                    $CategoriaService = new CategoriaService($this->request);
-                    $retorno = $CategoriaService->validarGet();
-                    break; 
-                case self::CLIENTE:
-                    $ClienteService = new ClienteService($this->request);
-                    $retorno = $ClienteService->validarGet();
-                    break; 
-                case self::CHAMADO:
-                    $ChamadoService = new ChamadoService($this->request);
-                    $retorno = $ChamadoService->validarGet();
-                    break;  
-                case self::ACOMPANHAMENTO:
-                    $AcompanhamentoService = new AcompanhamentoService($this->request);
-                    $retorno = $AcompanhamentoService->validarGet();
-                    break;   
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
             }
@@ -112,25 +94,9 @@ class RequestValidator
                     $UsuariosService = new UsuarioService($this->request);
                     $retorno = $UsuariosService->validarDelete();
                     break;
-                case self::ENTIDADE:
-                    $EntidadeService = new EntidadeService($this->request);
-                    $retorno = $EntidadeService->validarDelete();
-                    break;
-                case self::CATEGORIA:
-                    $CategoriaService = new CategoriaService($this->request);
-                    $retorno = $CategoriaService->validarDelete();
-                    break;
-                case self::CLIENTE:
-                    $ClienteService = new ClienteService($this->request);
-                    $retorno = $ClienteService->validarDelete();
-                    break;
-                case self::CHAMADO:
-                    $ChamadoService = new ChamadoService($this->request);
-                    $retorno = $ChamadoService->validarDelete();
-                    break;
-                case self::ACOMPANHAMENTO:
-                    $AcompanhamentoService = new AcompanhamentoService($this->request);
-                    $retorno = $AcompanhamentoService->validarDelete();
+               case self::SALAS:
+                    $SalaService = new SalaService($this->request);
+                    $retorno = $SalaService->validarDelete();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -149,30 +115,10 @@ class RequestValidator
                     $UsuariosService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $UsuariosService->validarPost();
                     break;
-                case self::ENTIDADE:
-                    $EntidadeService = new EntidadeService($this->request);
-                    $EntidadeService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $EntidadeService->validarPost();
-                    break;
-                case self::CATEGORIA:
-                    $CategoriaService = new CategoriaService($this->request);
-                    $CategoriaService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $CategoriaService->validarPost();
-                    break;
-                case self::CLIENTE:
-                    $ClienteService = new ClienteService($this->request);
-                    $ClienteService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $ClienteService->validarPost();
-                    break;
-                case self::CHAMADO:
-                    $ChamadoService = new ChamadoService($this->request);
-                    $ChamadoService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $ChamadoService->validarPost();
-                    break;
-                case self::ACOMPANHAMENTO:
-                    $AcompanhamentoService = new AcompanhamentoService($this->request);
-                    $AcompanhamentoService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $AcompanhamentoService->validarPost();
+                case self::SALAS:
+                    $SalaService = new SalaService($this->request);
+                    $SalaService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $SalaService->validarPost();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);
@@ -191,30 +137,10 @@ class RequestValidator
                     $UsuariosService->setDadosCorpoRequest($this->dadosRequest);
                     $retorno = $UsuariosService->validarPut();
                     break;
-                case self::ENTIDADE:
-                    $EntidadeService = new EntidadeService($this->request);
-                    $EntidadeService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $EntidadeService->validarPut();
-                    break;
-                case self::CATEGORIA:
-                    $CategoriaService = new CategoriaService($this->request);
-                    $CategoriaService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $CategoriaService->validarPut();
-                    break;
-                 case self::CLIENTE:
-                    $ClienteService = new ClienteService($this->request);
-                    $ClienteService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $ClienteService->validarPut();
-                    break;
-                case self::CHAMADO:
-                    $ChamadoService = new ChamadoService($this->request);
-                    $ChamadoService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $ChamadoService->validarPut();
-                    break;
-                case self::ACOMPANHAMENTO:
-                    $AcompanhamentoService = new AcompanhamentoService($this->request);
-                    $AcompanhamentoService->setDadosCorpoRequest($this->dadosRequest);
-                    $retorno = $AcompanhamentoService->validarPut();
+                case self::SALAS:
+                    $SalaService = new SalaService($this->request);
+                    $SalaService->setDadosCorpoRequest($this->dadosRequest);
+                    $retorno = $SalaService->validarPut();
                     break;
                 default:
                     throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_RECURSO_INEXISTENTE);

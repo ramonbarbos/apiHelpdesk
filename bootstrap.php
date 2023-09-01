@@ -6,13 +6,13 @@ error_reporting(E_ERROR);
 
 /* CONSTANTES DO BANCO */
 define('HOST', 'localhost');
-define('BANCO', 'api_helpdesk');
+define('BANCO', 'api_sala');
 define('USUARIO', 'root');
 define('SENHA', '');
 
 define('DS', DIRECTORY_SEPARATOR);
 define('DIR_APP', __DIR__);
-define('DIR_PROJETO', 'apiHelpdesk');
+define('DIR_PROJETO', 'apiSala');
 
 if(file_exists('autoload.php')){
     include 'autoload.php';

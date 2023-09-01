@@ -6,10 +6,10 @@ abstract class ConstantesGenericasUtil
 {
     /* REQUESTS */
     public const TIPO_REQUEST = ['GET', 'POST', 'DELETE', 'PUT'];
-    public const TIPO_GET = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO', 'ACOMPANHAMENTO'];
-    public const TIPO_POST = ['USUARIOS','ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO', 'ACOMPANHAMENTO'];
-    public const TIPO_DELETE = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO', 'ACOMPANHAMENTO'];
-    public const TIPO_PUT = ['USUARIOS', 'ENTIDADE','CATEGORIA', 'CLIENTE','CHAMADO', 'ACOMPANHAMENTO'];
+    public const TIPO_GET = ['USUARIOS','SALAS'];
+    public const TIPO_POST = ['USUARIOS','SALAS'];
+    public const TIPO_DELETE = ['USUARIOS','SALAS'];
+    public const TIPO_PUT = ['USUARIOS','SALAS'];
     
 
     /* ERROS */
@@ -36,6 +36,7 @@ abstract class ConstantesGenericasUtil
     public const MSG_ERRO_CPF_LOGIN_EXISTENTE = 'CPF e Login ja existente!';
     
     public const MSG_ERRO_LOGIN_SENHA_OBRIGATORIO = 'Login e Senha sao obrigatorios!';
+    public const MSG_ERRO_CADASTRO_GERAL = 'Campos sao obrigatorios!';
 
     /* RETORNO JSON */
     const TIPO_SUCESSO = 'sucesso';

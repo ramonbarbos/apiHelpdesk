@@ -322,7 +322,7 @@ class UsuarioService
                 $imageContent = base64_decode($imagem);
         
                 // Gere um nome único para o arquivo
-                $nomeArquivo = uniqid() . '.jpg';
+                $nomeArquivo = uniqid() . '.png';
         
                 // Defina o caminho completo do diretório de uploads
                 $diretorioUpload = './classes/Uploads/';

@@ -4,29 +4,30 @@ namespace Service;
 
 use Exception;
 use InvalidArgumentException;
-use Repository\AcompanhamentoRepository;
+use Repository\SalaRepository;
 use Util\ConstantesGenericasUtil;
 
-class AcompanhamentoService
+class SalaService
 {
 
 
-    public const TABELA = 'acompanhamento';
-    public const RECURSOS_GET = ['listar', 'mensagem'];
+    public const TABELA = 'salas';
+    public const RECURSOS_GET = ['listar'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
     public const RECURSOS_PUT = ['atualizar'];
+ 
 
     private array $dados;
 
     private array $dadosCorpoRequest;
 
-    private object $AcompanhamentoRepository;
+    private object $SalaRepository;
 
     public function __construct($dados = [])
     {
         $this->dados = $dados;
-        $this->AcompanhamentoRepository = new AcompanhamentoRepository();
+        $this->SalaRepository = new SalaRepository();
     }
 
     public function validarGet(){
@@ -34,13 +35,9 @@ class AcompanhamentoService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_GET, true)) {
 
-            if ($recurso === 'mensagem') {
-                $retorno = $this->getMensagem();
             
-            }else  {
                 $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
 
-            }
            
            
 
@@ -80,7 +77,7 @@ class AcompanhamentoService
         $retorno = null;
         $recurso = $this->dados['recurso'];
 
-      if (in_array($recurso, self::RECURSOS_POST, true)) {
+        if (in_array($recurso, self::RECURSOS_POST, true)) {
             $retorno = $this->$recurso();
         } else {
             throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_ID_OBRIGATORIO);
@@ -99,10 +96,9 @@ class AcompanhamentoService
         $recurso = $this->dados['recurso'];
         if (in_array($recurso, self::RECURSOS_PUT, true)) {
             if ($this->dados['id'] > 0) {
-
                
-                    $retorno = $this->$recurso();
-
+                   
+                        $retorno = $this->$recurso();
                     
             } else {
                 throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_ID_OBRIGATORIO);
@@ -126,94 +122,81 @@ class AcompanhamentoService
     }
 
     private function listar(){
-        return $this->AcompanhamentoRepository->getMySQL()->getAll(self::TABELA);
+        return $this->SalaRepository->getMySQL()->getAll(self::TABELA);
     }
- 
+
     
     private function getOneByKey()
     {
-        return $this->AcompanhamentoRepository->getMySQL()->getOneByKey(self::TABELA, $this->dados['id']);
+        return $this->SalaRepository->getMySQL()->getOneByKey(self::TABELA, $this->dados['id']);
     }
 
     private function deletar(){
-        return $this->AcompanhamentoRepository->getMySQL()->delete(self::TABELA, $this->dados['id']);
+        return $this->SalaRepository->getMySQL()->delete(self::TABELA, $this->dados['id']);
     }
 
     private function cadastrar() {
-
-        $mensagem = $this->dadosCorpoRequest['mensagem'];
-
         $data = [
+            'nome' => $this->dadosCorpoRequest['nome'],
             'usuario_id' => $this->dadosCorpoRequest['usuario_id'],
-            'usuario_acompanhamento' => $this->dadosCorpoRequest['usuario_acompanhamento'],
-            'mensagem' => $this->dadosCorpoRequest['mensagem'],
-            'chamado_id' => $this->dadosCorpoRequest['chamado_id'],
-          
+            'created_at' => $this->dadosCorpoRequest['created_at']
         ];
 
-        if($mensagem){
-            if (!$this->AcompanhamentoRepository->getMySQL()->getDb()->inTransaction()) {
-               
-                if ($this->AcompanhamentoRepository->insertUser( $data) > 0) {
-                    $idInserido = $this->AcompanhamentoRepository->getMySQL()->getDb()->lastInsertId();
-                    $this->AcompanhamentoRepository->getMySQL()->getDb()->commit();
+        $nomeExiste = $this->SalaRepository->checkExistingNome($data['nome']);
+
+        if ($data['nome'] && $nomeExiste  == 0) {
+    
+            
+            try {
+              
+    
+                if ($this->SalaRepository->insertUser($data) > 0) {
+                    $idInserido = $this->SalaRepository->getMySQL()->getDb()->lastInsertId();
+                    $this->SalaRepository->getMySQL()->getDb()->commit();
                     return ['id_inserido' => $idInserido];
                 }
+    
+                $this->SalaRepository->getMySQL()->getDb()->rollback();
+                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_GENERICO);
+
+            } catch (Exception $e) {
+                $this->SalaRepository->getMySQL()->getDb()->rollback();
+                throw $e;
             }
         }
-      
-        $this->AcompanhamentoRepository->getMySQL()->getDb()->rollBack();
-        return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
-
+    
+        throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_CADASTRO_GERAL);
     }
     
 
     private function atualizar()
     {
-        $mensagem = $this->dadosCorpoRequest['mensagem'];
-
-        $data = [
-            'usuario_acompanhamento' => $this->dadosCorpoRequest['usuario_acompanhamento'],
-            'mensagem' => $this->dadosCorpoRequest['mensagem'],
-            'chamado_id' => $this->dadosCorpoRequest['chamado_id'],
-        ];
-
-        if($mensagem){
-            if (!$this->AcompanhamentoRepository->getMySQL()->getDb()->inTransaction()) {
-                if ($this->AcompanhamentoRepository->updateUser($this->dados['id'],  $data) > 0) {
-                    $this->AcompanhamentoRepository->getMySQL()->getDb()->commit();
-                    return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
-
-                }
-            }
-        }
-
+       
+                $data = [
+                    'nome' => $this->dadosCorpoRequest['nome'],
+                    'usuario_id' => $this->dadosCorpoRequest['usuario_id'],
+                    'created_at' => $this->dadosCorpoRequest['created_at']
+                ];
         
-        $this->AcompanhamentoRepository->getMySQL()->getDb()->rollBack();
+         
+                if (!$this->SalaRepository->getMySQL()->getDb()->inTransaction()) {
+                  
+                    if ($this->SalaRepository->updateUser($this->dados['id'], $data) > 0) {
+                        $this->SalaRepository->getMySQL()->getDb()->commit();
+                        return ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                    }
+                }
+
+        //Se não atualizar nada encerrará a trasição
+        $this->SalaRepository->getMySQL()->getDb()->rollBack();
         return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
     }
+
+  
+       
     
-    public function getMensagem()
-    {
-        $id = $this->dados['id'];
 
-        if ($id) {
-            $consulMensagem = $this->AcompanhamentoRepository->consulMensagem($id);
-
-            if ($consulMensagem) {
-                return $consulMensagem;
-                
-
-            } else {
-                throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_INVALIDO);
-            }
-        } else {
-            throw new InvalidArgumentException(ConstantesGenericasUtil::MSG_ERRO_LOGIN_SENHA_OBRIGATORIO);
-        }
-    }
- 
-      
-        
+       
         
 
 }
