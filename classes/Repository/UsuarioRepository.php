@@ -151,6 +151,18 @@ class UsuarioRepository
         return $stmt->rowCount();
     }
 
+    public function selectOnline() {
+        $consulta = 'SELECT * FROM ' . self::TABELA . ' WHERE online = :online';
+        $stmt = $this->MySQL->getDb()->prepare($consulta);
+        $stmt->bindValue(':online', '1');
+    
+        
+            $stmt->execute();
+            $chamadoAberto = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $chamadoAberto;
+     
+    }
+
     public function getMySQL()
     {
         return $this->MySQL;

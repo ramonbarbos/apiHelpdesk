@@ -12,7 +12,7 @@ class UsuarioService
 
 
     public const TABELA = 'usuarios';
-    public const RECURSOS_GET = ['listar', 'fotoperfil'];
+    public const RECURSOS_GET = ['listar', 'fotoperfil', 'online'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
     public const RECURSOS_PUT = ['atualizar', 'upimagem', 'online'];
@@ -38,6 +38,9 @@ class UsuarioService
             if ($recurso === 'fotoperfil') {
                 $retorno = $this->getImage();
             
+            }else if($recurso === 'online') {
+                $retorno = $this->getOnline();
+                
             }else  {
                 $retorno = $this->dados['id'] > 0 ? $this->getOneByKey() : $this->$recurso();
 
@@ -135,7 +138,9 @@ class UsuarioService
     private function listar(){
         return $this->UsuariosRepository->getMySQL()->getAll(self::TABELA);
     }
-
+    private function getOnline(){
+        return  $this->UsuariosRepository->selectOnline();
+    }
     
     private function getOneByKey()
     {
