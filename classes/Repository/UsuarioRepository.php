@@ -139,6 +139,18 @@ class UsuarioRepository
         return $stmt->fetch();
 
     }
+
+    public function updateOnline($id, $data)
+    {
+        $consultaUpdate = 'UPDATE ' . self::TABELA . ' SET online = :online WHERE id = :id';
+        $this->MySQL->getDb()->beginTransaction();
+        $stmt = $this->MySQL->getDb()->prepare($consultaUpdate);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':online', $data['online']);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+
     public function getMySQL()
     {
         return $this->MySQL;

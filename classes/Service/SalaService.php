@@ -139,7 +139,7 @@ class SalaService
         $data = [
             'nome' => $this->dadosCorpoRequest['nome'],
             'usuario_id' => $this->dadosCorpoRequest['usuario_id'],
-            'created_at' => $this->dadosCorpoRequest['created_at']
+            'created_at' => date('Y-m-d H:i:s')
         ];
 
         $nomeExiste = $this->SalaRepository->checkExistingNome($data['nome']);
@@ -174,8 +174,7 @@ class SalaService
        
                 $data = [
                     'nome' => $this->dadosCorpoRequest['nome'],
-                    'usuario_id' => $this->dadosCorpoRequest['usuario_id'],
-                    'created_at' => $this->dadosCorpoRequest['created_at']
+                    
                 ];
         
          

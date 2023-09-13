@@ -15,7 +15,7 @@ class UsuarioService
     public const RECURSOS_GET = ['listar', 'fotoperfil'];
     public const RECURSOS_DELETE = ['deletar'];
     public const RECURSOS_POST = ['cadastrar'];
-    public const RECURSOS_PUT = ['atualizar', 'upimagem'];
+    public const RECURSOS_PUT = ['atualizar', 'upimagem', 'online'];
     public const RECURSOS_LOGIN = ['login'];
 
     private array $dados;
@@ -106,6 +106,8 @@ class UsuarioService
                     if ($recurso === 'upimagem') {
                         $retorno = $this->upImage();
                     
+                    }else if($recurso === 'online'){
+                        $retorno = $this->upOnline();
                     }else  {
                         $retorno = $this->$recurso();
                     }
@@ -349,5 +351,22 @@ class UsuarioService
         }
         
         
-
+        private function upOnline()
+        {
+           
+                $data = [
+                    'online' => $this->dadosCorpoRequest['online']
+                ];
+        
+                if ($this->UsuariosRepository->updateOnline($this->dados['id'], $data) > 0) {
+                    $this->UsuariosRepository->getMySQL()->getDb()->commit();
+                    return  ConstantesGenericasUtil::MSG_ATUALIZADO_SUCESSO;
+                }
+                
+            
+            //Se não atualizar nada encerrará a trasição
+            $this->UsuariosRepository->getMySQL()->getDb()->rollBack();
+            return ConstantesGenericasUtil::MSG_ERRO_NAO_AFETADO;
+        }
 }
+
